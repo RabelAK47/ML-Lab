@@ -44,18 +44,19 @@ int main()
         }
 
         double Count = (double) it->second;
+        double total = (double) N;
         double pi = yes/Count;
         double qi = no/Count;
 
         if(pi > 0.0 && qi > 0.0)
-            ans += (Count/(double)N) * (((-pi)*log2(pi)) + ((-qi)*log2(qi)));
+            ans += (Count/total) * (((-pi)*log2(pi)) + ((-qi)*log2(qi)));
         else if(pi > 0.0)
-            ans += (Count/(double)N) * ((-pi)*log2(pi));
+            ans += (Count/total) * ((-pi)*log2(pi));
         else
-            ans += (Count/(double)N) *  ((-qi)*log2(qi));
+            ans += (Count/total) *  ((-qi)*log2(qi));
     }
 
-    cout << "Entropy Base on Outlook " << ans << endl;
+    cout << "Entropy Based on Outlook " << ans << endl;
 }
 /*
 14
