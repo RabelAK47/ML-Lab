@@ -1,6 +1,9 @@
 #include "bits/stdc++.h"
 using namespace std;
 
+double prio_pos;
+double prio_neg;
+
 string do_lower(string str)
 {
     for(int i = 0; i < str.length(); i++)
@@ -10,105 +13,91 @@ string do_lower(string str)
     return str;
 }
 
-void display_prior_probability(int num_doc, int total_pos, int total_neg)
+void display_prior_probability(double num_doc, double total_pos, double total_neg)
 {
-    cout << "==============Displaying Prior Probability=========\n";
-    double pos = (double) total_pos / (double) num_doc;
-    double neg = (double) total_neg / (double) num_doc;
-    cout << "Prior Probability of Positive class " << pos << endl;
-    cout << "Prior Probability of Negative class " << neg << endl;
-
+    prio_pos = total_pos/num_doc;
+    prio_neg = total_neg/num_doc;
+    cout << "\nPrior Probabilities\n";
+    cout << "P(Positive) = " << setprecision(2) <<  prio_pos << endl;
+    cout << "P(Negative) = " << setprecision(2) << prio_neg << endl;
     cout << endl;
-    if(pos > neg)
-        cout << "Test data in Positive class\n";
-    else
-        cout << "Test data in Negative class\n";
 }
 
 int main()
 {
-    int total_pos = 0;
-    int total_neg = 0;
-    int num_doc;
+    double num_doc, total_pos = 0, total_neg = 0;
+    double pos_word = 0, neg_word = 0;
     cin >> num_doc;
     cin.ignore();
 
-    vector <string> V, review;
-    map <string, double> mp, mp2;
-
+    map <string, int> mpPos, mpNeg;
     set <string> St;
+
     for(int i = 0; i < num_doc; i++)
     {
-        string temp, word;
-        getline(cin, temp);
-        V.push_back(temp);
+        string line;
+        getline(cin, line);
+        line = do_lower(line);
 
         string rev;
         cin >> rev;
         cin.ignore();
-        review.push_back(rev);
 
         if(rev == "Positive")
         {
-            istringstream is(temp);
+            total_pos++;
+            istringstream is(line);
+            string word;
             while(is >> word)
             {
-                word = do_lower(word);
-                mp[word]++;
-                total_pos++;
+                mpPos[word]++;
+                pos_word++;
                 St.insert(word);
             }
         }
-
         else if(rev == "Negative")
         {
-            istringstream is(temp);
+            total_neg++;
+            istringstream is(line);
+            string word;
             while(is >> word)
             {
-                word = do_lower(word);
-                mp2[word]++;
-                total_neg++;
+                mpNeg[word]++;
+                neg_word++;
                 St.insert(word);
             }
         }
     }
 
-
-    map <string, double> :: iterator it;
-    cout << "=============Positive Reviews================\n";
-    for(it = mp.begin(); it != mp.end(); ++it)
-    {
-        cout << it->first << " " << it->second << endl;
-    }
-
-    cout << "=============Negative Reviews================\n";
-    for(it = mp2.begin(); it != mp2.end(); ++it)
-    {
-        cout << it->first << " " << it->second << endl;
-    }
-
-    cout << "word\tPositive\tNegative\n";
-
-    set <string> :: iterator its;
-    for(its = St.begin(); its != St.end(); ++its)
-    {
-        cout << *its << "\t" << mp[*its] << "\t" << mp2[*its] << endl;
-    }
-    //cout << St.size() << endl;
+    string test_data;
+    getline(cin, test_data);
+    test_data = do_lower(test_data);
 
     display_prior_probability(num_doc, total_pos, total_neg);
 
-    string test, word;
-    getline(cin, test);
-    istringstream is(test);
+    istringstream is(test_data);
+    string word;
+    cout << "Conditional Probability\n";
 
-//    cout << mp["buy"] << " " << total_pos << " " <<  St.size() << endl;
+    double positive = prio_pos;
+    double negative = prio_neg;
     while(is >> word)
     {
-        cout << "P(" << word << ", Positive) = "  << setprecision(2) << ( mp[word] + 1) / (total_pos + St.size())  << endl;
-    }
-}
+        double ans1 = (mpPos[word]+1)/(pos_word + St.size());
+        double ans2 = (mpNeg[word]+1)/(neg_word + St.size());
+        cout << word << "(Positive) " << setprecision(2) << ans1 << endl;
+        cout << word << "(Negative) " << setprecision(2) << ans2 << endl;
 
+        positive *= prio_pos;
+        negative *= prio_neg;
+    }
+    cout << endl;
+
+    if(positive >= negative)
+        cout << "Test data is Positive Sentiment\n";
+    else
+        cout << "Test data is Negative Sentiment\n";
+}
 /*
 5
 Phone got crashed
